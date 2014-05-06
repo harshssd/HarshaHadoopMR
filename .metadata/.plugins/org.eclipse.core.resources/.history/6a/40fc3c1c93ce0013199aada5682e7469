@@ -1,0 +1,36 @@
+package sample;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class ShortestPathReducer extends Reducer<LongWritable, Text, LongWritable, Text> {  
+    public void reduce(LongWritable key, Iterable<Text> values, Context context)  
+            throws IOException, InterruptedException {  
+
+    	
+    	String nodes = "SOMETHING";  
+        Text word = new Text();  
+        int lowest = 10000;//instead of infinity  
+        
+        //Node is sent as the key, might be the current or the adjacent node
+        for (Text val : values) {  
+            String[] sp = val.toString().split(" ");  
+            
+            //value is either the distance of the current node or the adjacent nodes
+            // or value can be the list of adjacent nodes, checking it with the flag
+            if (sp[0].equalsIgnoreCase("NODES")) {  
+                nodes = null;  
+                nodes = sp[1];  
+            } else if (sp[0].equalsIgnoreCase("VALUE")) {  
+                int distance = Integer.parseInt(sp[1]);  
+                lowest = Math.min(distance, lowest);  
+            }  
+        }  
+        word.set(lowest + " " + nodes);  
+        context.write(key, word);  
+        word.clear();  
+    }  
+}

@@ -1,0 +1,69 @@
+package sample;
+
+import java.io.IOException;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+/*
+ * Kmeans Mapper will always read from input and devide the dat
+ * a based on the current mean/centroid  
+ * 
+ * So we have three known Centroid for each round and the role of mapper 
+ * is to get the the key value sepration based on how data shoud be clustered
+ * 
+ * */
+public class KMeansMapper extends Mapper<Object, Text, IntWritable,Text>{
+
+	
+	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+		
+		//First Input will be  record from the input file  - uowusers 17
+		//Split the value and take the number of Followers
+      String[] input = value.toString().split(" ");
+      int numFollowers = Integer.parseInt(input[1]);
+		
+      //Read the centroid file and get the 3 centroid values
+      Path centroidPath = new Path(KMeans.centroidFile);
+      String centroid = KMeans.readCentroidFile(centroidPath, KMeans.conf);
+      String[] centroids = centroid.split(" ");
+      int centroid0 = Integer.parseInt(centroids[0]);
+      int centroid1 = Integer.parseInt(centroids[1]);
+      int centroid2 = Integer.parseInt(centroids[2]);
+    		  
+      //choose mid value between centroids in order assign the user to a centroid
+      int mid01 = (centroid1 - centroid0 ) / 2; 
+      int mid12 = (centroid2 - centroid1 ) / 2;
+      
+      //Based on the distance to centroids assign the user a centroid nearby
+      if(numFollowers<=mid01){
+    	  value.set(value.toString() + "low");
+    	  context.write(new IntWritable(centroid0), value);
+      }else if(numFollowers>mid01 && numFollowers<=mid12){
+    	  value.set(value.toString() + "medium");
+    	  context.write(new IntWritable(centroid1), value);
+      }else{
+    	  value.set(value.toString() + "high");
+    	  context.write(new IntWritable(centroid2), value);
+      }
+    		  
+//		System.out.println(key+" " +value);
+//	int average1=0,average2=0,average3=0;
+//	//get average value from some file 
+//	
+//	
+//	int mid1 =(average1+average1)/2;
+//	int mid2 = (average2+average3)/2;
+//	String str = value.toString();
+//	int followers=Integer.parseInt( str.split(" ")[1]);
+//	
+//		if (followers< mid1)
+//			context.write( new IntWritable (average1), value );
+//		else if (followers<mid2)
+//			context.write( new IntWritable (average2), value );
+//		else 
+//			context.write( new IntWritable (average3), value );
+
+	}
+}

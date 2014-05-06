@@ -1,0 +1,148 @@
+package sample;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ShortestPath {
+
+	private static final transient Logger LOG = LoggerFactory.getLogger(ShortestPath.class);
+
+	public static void main(String[] args) throws Exception {
+		
+		Configuration conf = new Configuration();
+ 
+		LOG.info("HDFS Root Path: {}", conf.get("fs.defaultFS"));
+		LOG.info("MR Framework: {}", conf.get("mapreduce.framework.name"));
+
+        //set in and out to args.
+//        IN = args[0];
+//        OUT = args[1];
+		String inputPath = "/graphData";
+		String outputPath = "/outputShortestPath";
+
+ 
+//        String infile = IN;
+//        String outputfile = OUT + System.nanoTime();
+ 
+        boolean isdone = false;
+        boolean success = false;
+ 
+        HashMap <Integer, Integer> _map = new HashMap<Integer, Integer>();
+ 
+        while(isdone == false){
+ 
+            Job job = Job.getInstance(conf);
+            job.setJarByClass(ShortestPath.class);
+            job.setJobName("ShortestPath");
+            job.setOutputKeyClass(LongWritable.class);
+            job.setOutputValueClass(Text.class);
+            job.setMapperClass(ShortestPathMapper.class);
+            job.setReducerClass(ShortestPathReducer.class);
+//            job.setInputFormatClass(TextInputFormat.class);
+//            job.setOutputFormatClass(TextOutputFormat.class);
+ 
+            deleteFolder(conf,outputPath);
+            
+        	FileInputFormat.addInputPath(job, new Path(inputPath));
+    		FileOutputFormat.setOutputPath(job, new Path(outputPath));
+//            FileInputFormat.addInputPath(job, new Path(infile));
+//            FileOutputFormat.setOutputPath(job, new Path(outputfile));
+ 
+            success = job.waitForCompletion(true);
+ 
+            //remove the input file
+            //http://eclipse.sys-con.com/node/1287801/mobile
+//            if(infile != inputPath){
+//                String indir = infile.replace("part-r-00000", "");
+//                Path ddir = new Path(indir);
+//                FileSystem dfs = FileSystem.get(getConf());
+//                dfs.delete(ddir, true);
+//            }
+            deleteFolder(conf,inputPath);
+            
+            inputPath = outputPath+"/part-r-00000";
+            outputPath = outputPath + System.nanoTime();
+ 
+            //do we need to re-run the job with the new input file??
+            //http://www.hadoop-blog.com/2010/11/how-to-read-file-from-hdfs-in-hadoop.html
+            isdone = true;//set the job to NOT run again!
+            Path ofile = new Path(outputPath);
+            FileSystem fs = FileSystem.get(new Configuration());
+            BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(ofile)));
+ 
+            HashMap<Integer, Integer> imap = new HashMap<Integer, Integer>();
+            String line=br.readLine();
+            while (line != null){
+                //each line looks like 0 1 2:3:
+                //we need to verify node -> distance doesn't change
+                String[] sp = line.split(" ");
+                int node = Integer.parseInt(sp[0]);
+                int distance = Integer.parseInt(sp[1]);
+                imap.put(node, distance);
+                line=br.readLine();
+            }
+            if(_map.isEmpty()){
+                //first iteration... must do a second iteration regardless!
+                isdone = false;
+            }else{
+                //http://www.java-examples.com/iterate-through-values-java-hashmap-example
+                //http://www.javabeat.net/articles/33-generics-in-java-50-1.html
+                Iterator<Integer> itr = imap.keySet().iterator();
+                while(itr.hasNext()){
+                    int key = itr.next();
+                    int val = imap.get(key);
+                    if(_map.get(key) != val){
+                        //values aren't the same... we aren't at convergence yet
+                        isdone = false;
+                    }
+                }
+            }
+            if(isdone == false){
+                _map.putAll(imap);//copy imap to _map for the next iteration (if required)
+            }
+            
+            System.exit(job.waitForCompletion(success) ? 0 : 1);
+        }
+ 
+ //       return success ? 0 : 1;
+
+//		System.exit(job.waitForCompletion(true) ? 0 : 1);
+	}
+	
+	/**
+	 * Delete a folder on the HDFS. This is an example of how to interact
+	 * with the HDFS using the Java API. You can also interact with it
+	 * on the command line, using: hdfs dfs -rm -r /path/to/delete
+	 * 
+	 * @param conf a Hadoop Configuration object
+	 * @param folderPath folder to delete
+	 * @throws IOException
+	 */
+	private static void deleteFolder(Configuration conf, String folderPath ) throws IOException {
+		FileSystem fs = FileSystem.get(conf);
+		Path path = new Path(folderPath);
+		if(fs.exists(path)) {
+			fs.delete(path,true);
+		}
+	}
+	
+    public int run(String[] args) throws Exception {
+    	
+    	return 0;
+    }
+	
+}

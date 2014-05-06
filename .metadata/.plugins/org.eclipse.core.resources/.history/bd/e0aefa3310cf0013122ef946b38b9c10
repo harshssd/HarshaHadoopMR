@@ -1,0 +1,106 @@
+package sample;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class KMeans {
+
+	private static final transient Logger LOG = LoggerFactory.getLogger(KMeans.class);
+
+	public static void main(String[] args) throws Exception {
+		
+		Configuration conf = new Configuration();		
+
+		LOG.info("HDFS Root Path: {}", conf.get("fs.defaultFS"));
+		LOG.info("MR Framework: {}", conf.get("mapreduce.framework.name"));
+		/* Set the Input/Output Paths on HDFS */
+		String inputPath = "inputKMeans";
+		String outputPath = "outpuKMeans";
+		String centroidFile = "centroid";
+		
+		Path centroidPath = new Path(centroidFile);
+        String centroid = readCentroidFile(centroidPath, conf);
+        System.out.println(centroid);
+
+		boolean success = false;
+		while (!success)
+		{
+		deleteFolder(conf,outputPath);
+		
+		Job job = Job.getInstance(conf);
+
+		job.setJarByClass(KMeans.class);
+		job.setMapperClass(KMeansMapper.class);
+		job.setCombinerClass(KMeansReducer.class);
+		job.setReducerClass(KMeansReducer.class);
+		job.setOutputKeyClass(Text.class);
+		job.setOutputValueClass(IntWritable.class);
+		FileInputFormat.addInputPath(job, new Path(inputPath));
+		FileOutputFormat.setOutputPath(job, new Path(outputPath));
+	     job.waitForCompletion(true);
+	     
+	    success = checkIfItsComplete(centroid,conf);
+/*	    if(!success){
+	    	if (!infile.equals(inputFilePath)) {  
+                String indir = infile.replace("part-r-00000", "");  
+                Path ddir = new Path(indir);  
+                FileSystem dfs = FileSystem.get(getConf());  
+                dfs.delete(ddir, true);  
+            }
+	    }
+	    */
+		}
+
+	}
+	
+	private static String readCentroidFile(Path centroidPath,
+			Configuration conf) throws IOException {
+        FileSystem fs = FileSystem.get(conf);  
+        
+//        FSDataInputStream in = fs.open(centroidPath);
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(centroidPath)));    
+        String line = br.readLine();  
+        while (line != null){
+  //              System.out.println(line);
+                line=br.readLine();
+        }
+        return line;
+	}
+
+	private static boolean checkIfItsComplete(String centroid, Configuration conf) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/**
+	 * Delete a folder on the HDFS. This is an example of how to interact
+	 * with the HDFS using the Java API. You can also interact with it
+	 * on the command line, using: hdfs dfs -rm -r /path/to/delete
+	 * 
+	 * @param conf a Hadoop Configuration object
+	 * @param folderPath folder to delete
+	 * @throws IOException
+	 */
+	private static void deleteFolder(Configuration conf, String folderPath ) throws IOException {
+		FileSystem fs = FileSystem.get(conf);
+		Path path = new Path(folderPath);
+		if(fs.exists(path)) {
+			fs.delete(path,true);
+		}
+	}
+}

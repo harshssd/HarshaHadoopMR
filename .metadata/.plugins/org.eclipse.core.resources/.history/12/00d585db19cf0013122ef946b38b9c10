@@ -1,0 +1,34 @@
+package sample;
+
+import java.io.IOException;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class KMeansReducer 
+extends Reducer<IntWritable,Text,IntWritable,Text> {
+
+	public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+     
+	//input will be the centroid as key and the user specification as value
+	//key = 50; value = uowusers 17 low	
+	
+	//Average the number of followers for each centroid and emit new centroid
+		int average;
+		int totalFollowers;
+		String[] line
+		for(Text value: values){
+			line = values.toString().split(" ");
+			totalFollowers += Integer.parseInt(line[1]);
+		}
+		
+//	System.out.println(key );	
+//     int counter=0;
+//     for(Text value :values)
+//     {
+//    	 
+//    	 counter++;
+//     }
+	}
+}

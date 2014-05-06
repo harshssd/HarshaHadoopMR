@@ -1,0 +1,64 @@
+package sample;
+
+import java.io.IOException;
+import java.util.Set;
+
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.MapWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class PairsMapper extends Mapper<LongWritable, Text, WordPair, IntWritable>{
+
+	private WordPair wordPair = new WordPair();
+	private WordPair wordPairSpecial = new WordPair();
+	private IntWritable ONE = new IntWritable(1);
+	private MapWritable map = new MapWritable();
+
+	@Override
+	protected void setup(Context context)
+			throws IOException, InterruptedException {
+		super.setup(context);
+	}
+	
+	@Override
+	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+		String[] tokens = value.toString().split("\\s+");
+		
+		if (tokens.length > 1) {
+			for (int i = 0; i < tokens.length-1; i++) {
+				wordPair.setWord(tokens[i]);
+				wordPairSpecial.setWord(tokens[i]);
+				for (int j = i+1; j < tokens.length; j++) {
+					wordPair.setNeighbor(tokens[j]);
+					wordPairSpecial.setNeighbor("*");
+					context.write(wordPair, ONE);
+					//context.write(wordPairSpecial, ONE);
+				}
+				wordPairSpecial.setNeighbor("*");
+				context.write(wordPairSpecial, new IntWritable(tokens.length-(i+1)));
+			}
+		}
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		super.finalize();
+		
+		Set<Writable> keys = map.keySet();
+        for (Writable key : keys) {
+            IntWritable fromCount = (IntWritable) map.get(key);
+            if (map.containsKey(key)) {
+                IntWritable count = (IntWritable) map.get(key);
+                count.set(count.get() + fromCount.get());
+            } else {
+                map.put(key, fromCount);
+            }
+        }
+        
+	}
+	
+
+}

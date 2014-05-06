@@ -22,13 +22,15 @@ public class PairsMapper extends Mapper<LongWritable, Text, WordPair, IntWritabl
 
              int start = (i - neighbors < 0) ? 0 : i - neighbors;
              int end = (i + neighbors >= tokens.length) ? tokens.length - 1 : i + neighbors;
-              for (int j = start; j <= end; j++) {
+              
+             for (int j = start; j <= end; j++) {
                   if (j == i) continue;
                    wordPair.setNeighbor(tokens[j]);
                    context.write(wordPair, ONE);
-              }
-          }
-      }
-  }
+             }
+             
+           }
+        }
+    }
 	
 }

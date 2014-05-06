@@ -1,0 +1,54 @@
+package sample;
+
+import java.io.IOException;
+
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class KMeansReducer 
+extends Reducer<IntWritable,Text,IntWritable,Text> {
+
+	public int newCentroid0 = 0;
+	public int newCentroid1 = 0;
+	public int newCentroid2 = 0;
+	public void reduce(IntWritable key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+     
+	//input will be the centroid as key and the user specification as value
+	//key = 50; value = uowusers 17 low	
+	
+	//Average the number of followers for each centroid and emit new centroid
+		int totalFollowers = 0;
+		int count = 0;
+		String[] line;
+		for(Text value: values){
+			line = value.toString().split(" ");
+			totalFollowers += Integer.parseInt(line[1]);
+			++count;
+		}
+		System.out.print("TotalFollowers " +totalFollowers);
+		int newCentroid = totalFollowers/count;
+		for(Text value: values){
+			context.write(new IntWritable(newCentroid), value);
+		}
+		
+		if(newCentroid0 == 0){
+			newCentroid0 = newCentroid; 
+		}else if(newCentroid1 == 0){
+			newCentroid1 = newCentroid;
+		}else{
+			newCentroid2 = newCentroid;
+		}
+
+	}
+	
+	@Override
+	protected void cleanup(Context context)
+			throws IOException, InterruptedException {
+		super.cleanup(context);
+		String centroidFileContent = newCentroid0+" "+newCentroid1+" "+newCentroid2;
+		KMeans.writeToCentroidFile(centroidFileContent, KMeans.conf, new Path(KMeans.centroidFile));
+	}
+	
+}

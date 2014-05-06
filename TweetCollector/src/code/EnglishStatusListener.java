@@ -10,7 +10,9 @@ import twitter4j.StatusListener;
 
 public class EnglishStatusListener implements StatusListener{
 
+	
 	private static final transient Logger LOG = LoggerFactory.getLogger(EnglishStatusListener.class);
+	
 	
 	@Override
 	public void onException(Exception arg0) {
@@ -46,8 +48,12 @@ public class EnglishStatusListener implements StatusListener{
 	@Override
 	public void onStatus(Status status) {
 		String tweetText = status.getText();
+	//	System.out.println(tweetText);
 		if(isEnglish(tweetText)) {
-			LOG.info(status.getText());
+			if((tweetText.contains("mobile")|tweetText.contains("phone")
+					|tweetText.contains("android")|tweetText.contains("iPhone"))){
+				LOG.info(status.getText());
+			}
 		}
 	}
 

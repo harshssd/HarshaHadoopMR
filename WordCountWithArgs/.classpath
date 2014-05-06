@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-hdfs-nfs-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-app-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-jobclient-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-applications-unmanaged-am-launcher-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-web-proxy-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-common-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-common-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-auth-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-applications-distributedshell-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-hs-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-shuffle-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-core-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-mapreduce-client-hs-plugins-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-resourcemanager-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-hdfs-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-common-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-api-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-nfs-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-site-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-server-nodemanager-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-common-2.2.0.jar"/>
+	<classpathentry kind="lib" path="/usr/local/hadoop2x-eclipse-plugin/build/contrib/eclipse-plugin/lib/hadoop-yarn-client-2.2.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

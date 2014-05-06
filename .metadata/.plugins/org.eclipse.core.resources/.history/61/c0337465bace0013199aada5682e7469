@@ -1,0 +1,23 @@
+package sample;
+
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+/*
+ * Kmeans Mapper will always read from input and devide the dat
+ * a based on the current mean/centroid  
+ * 
+ * So we have three known Centroid for each round and the role of mapper 
+ * is to get the the key value sepration based on how data shoud be clustered
+ * 
+ * */
+public class KMeansMapper extends Mapper<Object, Text, Text, IntWritable>{
+
+	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+
+	int average1,average2,average3;
+		
+		
+	}
+}

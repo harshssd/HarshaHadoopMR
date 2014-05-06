@@ -1,0 +1,39 @@
+package sample;
+
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class PairsMapper extends Mapper<LongWritable, Text, WordPair, IntWritable>{
+
+	private WordPair wordPair = new WordPair();
+	private WordPair wordPairSpecial = new WordPair();
+	private IntWritable ONE = new IntWritable(1);
+
+	@Override
+	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+		String[] tokens = value.toString().split("\\s+");
+		
+		if (tokens.length > 1) {
+			for (int i = 0; i < tokens.length-1; i++) {
+				tokens[i] = tokens[i].replaceAll("\\W+","");
+				if(tokens[i].equals("")){
+					continue;
+				}
+				wordPair.setWord(tokens[i]);
+				wordPairSpecial.setWord(tokens[i]);
+				for (int j = i+1; j < tokens.length; j++) {
+					wordPair.setNeighbor(tokens[j]);
+			//		wordPairSpecial.setNeighbor("*");
+					context.write(wordPair, ONE);
+					//context.write(wordPairSpecial, ONE);
+				}
+				wordPairSpecial.setNeighbor("*");
+				context.write(wordPairSpecial, new IntWritable(tokens.length-(i+1)));
+			}
+		}
+	}
+
+}
